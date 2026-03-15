@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>親子心理知識對戰 · 家長版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+            user-select: none;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #2b4b6f, #1e3a5f);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background: #f2e9d0;
+            border-radius: 48px;
+            padding: 30px 30px 40px;
+            box-shadow: 0 25px 35px rgba(0,0,0,0.6), inset 2px 2px 10px #fff9e6, inset -3px -3px 8px #b9a98b;
+            border: 4px solid #f5d7b3;
+        }
+        /* 對手區域 */
+        .opponent-area {
+            background: #e1d2b6;
+            border-radius: 60px;
+            padding: 25px 25px 20px;
+            border: 5px solid #a5826b;
+            box-shadow: inset 0 0 0 3px #fdf0d8, 0 8px 0 #7a5c45;
+        }
+        .opponent-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #b89e87;
+            padding: 12px 25px;
+            border-radius: 40px;
+            border: 3px solid #ecdbbd;
+            box-shadow: inset 0 2px 5px #937b64;
+        }
+        .opponent-emoji {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: #f5e7ce;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 6px 0 #7b5f4b, 0 8px 12px black;
+            font-size: 64px;
+            line-height: 1;
+        }
+        .opponent-name {
+            font-size: 36px;
+            font-weight: 800;
+            color: #2d1f12;
+            text-shadow: 2px 2px 0 #e9dac0;
+            flex: 1;
+        }
+        .hp-bar-container {
+            background: #2e1c12;
+            border-radius: 40px;
+            padding: 5px 10px;
+            border: 3px solid #d8b282;
+            box-shadow: inset 0 2px 5px black;
+        }
+        .hp-bar {
+            width: 180px;
+            height: 28px;
+            background: #611f1f;
+            border-radius: 30px;
+            overflow: hidden;
+            border: 2px solid #ffbaba;
+        }
+        .hp-fill {
+            height: 100%;
+            width: 100%;
+            background: #4caf50;
+            background: linear-gradient(90deg, #58c45b, #2e9140);
+            border-radius: 30px;
+            transition: width 0.2s;
+        }
+        .hp-text {
+            color: white;
+            font-weight: bold;
+            margin-left: 15px;
+            font-size: 26px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 black;
+        }
+        /* 問題區 */
+        .question-area {
+            background: #fcf3e0;
+            border-radius: 80px;
+            padding: 20px;
+            margin: 30px 0 25px;
+            border: 6px solid #c9af8b;
+            box-shadow: inset 0 0 0 4px #ffeec9, 0 8px 0 #8b6f50;
+            text-align: center;
+        }
+        .question-text {
+            font-size: 36px;
+            font-weight: 700;
+            color: #263f5c;
+            text-shadow: 2px 2px 0 #c9e2ff;
+            background: #e7d6b5;
+            border-radius: 70px;
+            padding: 20px;
+            border: 4px solid #ab8b64;
+            word-break: break-word;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 答案按鈕區 */
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+        .answer-btn {
+            background: #ffeac2;
+            border: 5px solid #9c7e5e;
+            border-radius: 60px;
+            font-size: 36px;
+            font-weight: 600;
+            color: #1f3a4b;
+            padding: 15px 10px;
+            cursor: pointer;
+            box-shadow: 0 9px 0 #6b4f38, 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.05s linear;
+            text-align: center;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+        .answer-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 3px 0 #6b4f38, 0 5px 12px rgba(0,0,0,0.3);
+        }
+        .answer-btn.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+        /* 收藏/徽章區 */
+        .collection-area {
+            margin-top: 35px;
+            background: #e6cfb2;
+            border-radius: 50px;
+            padding: 20px 25px;
+            border: 5px solid #af895f;
+            box-shadow: inset 0 0 0 3px #faeacb, 0 8px 0 #7b5c3a;
+        }
+        .collection-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #392b1c;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #a88764;
+            display: inline-block;
+            padding: 6px 30px;
+            border-radius: 40px;
+            color: #fef5d6;
+            text-shadow: 2px 2px 0 #52412e;
+            letter-spacing: 1px;
+        }
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            min-height: 70px;
+        }
+        .badge-card {
+            background: #fbefda;
+            border: 4px solid #8b6d4b;
+            border-radius: 50px;
+            padding: 8px 22px 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 30px;
+            font-weight: 600;
+            color: #2e3f28;
+            box-shadow: 0 6px 0 #624e35;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .badge-card.active {
+            border: 5px solid #ffb347;
+            background: #fff1b5;
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px #f3c26b, 0 6px 0 #b37b3a;
+        }
+        .badge-card .wins {
+            background: #496e51;
+            color: white;
+            border-radius: 30px;
+            padding: 4px 16px;
+            font-size: 22px;
+            font-weight: 400;
+            margin-left: 5px;
+        }
+        .badge-emoji {
+            font-size: 48px;
+            line-height: 1;
+            filter: drop-shadow(2px 2px 2px #333);
+        }
+        /* 解釋區 & 狀態 */
+        .explanation-message {
+            font-size: 28px;
+            font-weight: 500;
+            color: #2d4e2d;
+            background: #f0f0d0;
+            border-radius: 40px;
+            padding: 15px 20px;
+            margin: 20px 0 10px;
+            border: 3px solid #9baf6b;
+            box-shadow: inset 0 0 0 2px #ffffe0;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .battle-message {
+            font-size: 32px;
+            font-weight: 600;
+            color: #ec5565;
+            text-shadow: 2px 2px #ffe09c;
+            text-align: center;
+            margin: 15px 0 0;
+            min-height: 55px;
+        }
+        .next-battle-btn {
+            background: #fecb69;
+            border: 5px solid #aa6f3c;
+            border-radius: 40px;
+            font-size: 38px;
+            font-weight: bold;
+            padding: 10px 30px;
+            color: #2f2a1f;
+            box-shadow: 0 7px 0 #785f3a;
+            cursor: pointer;
+            display: inline-block;
+            transition: 0.05s;
+            border: none;
+            margin-top: 15px;
+        }
+        .next-battle-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #785f3a;
+        }
+        .hidden {
+            display: none;
+        }
+        .flex-center {
+            display: flex;
+            justify-content: center;
+        }
+        .hp-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- 對手區：心理導師 -->
+        <div class="opponent-area">
+            <div class="opponent-info">
+                <span class="opponent-emoji" id="opponentEmoji">🧠</span>
+                <span class="opponent-name" id="opponentName">心理導師</span>
+                <div class="hp-container">
+                    <div class="hp-bar-container">
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="opponentHpFill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <span class="hp-text" id="opponentHpText">3/3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 問題區 -->
+        <div class="question-area">
+            <div class="question-text" id="questionText">點擊「新挑戰」開始</div>
+        </div>
+
+        <!-- 答案按鈕 -->
+        <div class="answers-grid" id="answersContainer">
+            <button class="answer-btn" data-index="0">選項 1</button>
+            <button class="answer-btn" data-index="1">選項 2</button>
+            <button class="answer-btn" data-index="2">選項 3</button>
+            <button class="answer-btn" data-index="3">選項 4</button>
+        </div>
+
+        <!-- 解釋區 (每次答題後顯示) -->
+        <div class="explanation-message" id="explanationMessage"></div>
+
+        <!-- 戰鬥訊息 & 繼續/新挑戰按鈕 -->
+        <div class="battle-message" id="battleMessage"></div>
+        <div class="flex-center">
+            <button class="next-battle-btn" id="nextBattleBtn">⚔️ 新挑戰 ⚔️</button>
+        </div>
+
+        <!-- 收藏 / 切換知識徽章 (原本的寶可夢) -->
+        <div class="collection-area">
+            <div class="collection-title">📚 我的知識徽章</div>
+            <div class="badge-list" id="badgeList"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 音效管理 (與之前相同) ----------
+            const Sound = (function() {
+                let audioCtx = null;
+                function initContext() {
+                    if (audioCtx) return audioCtx;
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    return audioCtx;
+                }
+                function playTone(freq, dur, type = 'sine', vol = 0.2, delay = 0) {
+                    const ctx = initContext();
+                    if (ctx.state === 'suspended') {
+                        ctx.resume().then(() => _play(ctx, freq, dur, type, vol, delay));
+                    } else {
+                        _play(ctx, freq, dur, type, vol, delay);
+                    }
+                }
+                function _play(ctx, freq, dur, type, vol, delay) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + delay);
+                    osc.stop(ctx.currentTime + delay + dur);
+                }
+                return {
+                    correct: function() { playTone(720, 0.15, 'sine', 0.15); },
+                    wrong: function() { playTone(320, 0.2, 'sawtooth', 0.1); },
+                    victory: function() {
+                        playTone(523.25, 0.15, 'sine', 0.15, 0.0);
+                        playTone(587.33, 0.15, 'sine', 0.15, 0.15);
+                        playTone(659.25, 0.15, 'sine', 0.15, 0.3);
+                        playTone(698.46, 0.25, 'sine', 0.15, 0.45);
+                        playTone(880.00, 0.3, 'sine', 0.2, 0.7);
+                    },
+                    defeat: function() { playTone(220, 0.4, 'triangle', 0.2); },
+                    switch: function() { playTone(520, 0.08, 'sine', 0.1); },
+                    nextBattle: function() { playTone(660, 0.1, 'sine', 0.12); },
+                    evolve: function() {
+                        playTone(523.25, 0.1, 'sine', 0.15, 0.0);
+                        playTone(659.25, 0.1, 'sine', 0.15, 0.12);
+                        playTone(783.99, 0.2, 'sine', 0.2, 0.24);
+                    }
+                };
+            })();
+
+            // ---------- 兒童心理題庫 (歡迎擴充) ----------
+            const QUESTION_BANK = [
+                {
+                    question: "嬰兒大約在幾個月大時開始發展「物體恆存」的概念（知道看不見的東西仍然存在）？",
+                    options: ["0-2個月", "4-7個月", "8-12個月", "1歲半以後"],
+                    correct: 2, // 索引從0開始
+                    explanation: "根據皮亞傑的認知發展理論，物體恆存約在8-12個月開始萌芽，例如嬰兒會尋找被藏起來的玩具。"
+                },
+                {
+                    question: "下列哪一項不是建立安全依附關係的有效方式？",
+                    options: ["對孩子的哭聲敏感且一致回應", "鼓勵孩子獨立探索但隨時提供支持", "只在孩子表現好時才給予關注", "與孩子有溫暖的身體接觸"],
+                    correct: 2,
+                    explanation: "安全依附需要穩定、一致的關愛，而非有條件的關注。選擇性關注可能讓孩子產生不安全感。"
+                },
+                {
+                    question: "幼兒（2-5歲）出現「發脾氣」的行為，通常最可能的原因是？",
+                    options: ["故意挑戰權威", "語言表達能力不足，挫折感高", "生理疾病", "缺乏管教"],
+                    correct: 1,
+                    explanation: "此階段幼兒語言能力尚未成熟，當需求無法被理解或滿足時，容易以發脾氣來宣洩挫折。"
+                },
+                {
+                    question: "關於「暫停法」(time-out)，下列何者運用較為恰當？",
+                    options: ["每次暫停至少30分鐘", "暫停區域應有趣味玩具", "暫停時間約每歲1分鐘", "暫停時可與孩子爭論原因"],
+                    correct: 2,
+                    explanation: "暫停法建議「每歲1分鐘」，例如3歲孩子約3分鐘，且環境應單調無聊，執行前簡單說明原因即可，避免爭論。"
+                },
+                {
+                    question: "以下哪一種管教方式最可能促進孩子的內在道德感？",
+                    options: ["懲罰", "說理與解釋後果", "取消特權", "忽視行為"],
+                    correct: 1,
+                    explanation: "研究顯示，向孩子解釋行為對他人造成的影響，能幫助他們發展同理心與內在道德標準。"
+                },
+                {
+                    question: "兒童在幾歲左右開始能理解「性別恆常性」（知道自己的性別不會改變）？",
+                    options: ["2-3歲", "4-5歲", "6-7歲", "8-9歲"],
+                    correct: 2,
+                    explanation: "多數兒童在6-7歲達到性別恆常性，了解性別是穩定的，不受外表或活動改變。"
+                },
+                {
+                    question: "下列何者不是 ADHD（注意力不足過動症）的核心症狀？",
+                    options: ["注意力不集中", "衝動", "攻擊行為", "過動"],
+                    correct: 2,
+                    explanation: "攻擊行為可能共病出現，但不屬於核心診斷標準。核心為注意力缺損、過動、衝動。"
+                },
+                {
+                    question: "當孩子畫畫時將天空塗成紫色，家長比較合宜的回應是？",
+                    options: ["糾正他「天空是藍色的」", "稱讚他「畫得好漂亮」但不討論內容", "問他「你畫的天空好特別，可以跟我聊聊嗎？」", "拿範例要他照著畫"],
+                    correct: 2,
+                    explanation: "開放式問句能鼓勵孩子表達想法，尊重其創造力，同時增進親子對話。"
+                },
+                {
+                    question: "研究指出，哪一種教養風格最可能培養出有能力、快樂的兒童？",
+                    options: ["專制型（高要求低回應）", "寬容型（低要求高回應）", "民主型（高要求高回應）", "忽視型（低要求低回應）"],
+                    correct: 2,
+                    explanation: "民主型父母既有規範又能溫暖回應，有助孩子發展自主性與責任感。"
+                },
+                {
+                    question: "面對孩子說謊，下列哪一種回應較能鼓勵誠實？",
+                    options: ["嚴厲處罰", "說謊就是壞孩子", "感謝他願意說實話，並討論如何解決問題", "假裝沒發生"],
+                    correct: 2,
+                    explanation: "當孩子因害怕而說謊，懲罰可能讓他更不敢誠實。肯定誠實並一起解決問題，能建立信任。"
+                }
+            ];
+
+            // ----- 徽章(原本的寶可夢)初始化：家長只有一個基礎徽章 -----
+            let badges = [
+                { baseName: '基礎心理', name: '新手家長', emoji: '📘', wins: 0, stage: 'base' }
+            ];
+            let currentBadgeIndex = 0;
+
+            // 當前對手 (心理導師)
+            let currentOpponent = {
+                name: '心理導師',
+                emoji: '🧠'
+            };
+
+            // 戰鬥狀態
+            let playerHp = 3;
+            let opponentHp = 3;
+            let battleActive = true;           // 戰鬥是否進行中 (未結束)
+            let waitingForNext = false;        // 是否在等待點擊「下一題」
+            let currentQuestion = null;         // 當前題目物件
+            let selectedAnswerIndex = -1;       // 暫存
+
+            // DOM 元素
+            const opponentEmojiEl = document.getElementById('opponentEmoji');
+            const opponentNameEl = document.getElementById('opponentName');
+            const opponentHpFill = document.getElementById('opponentHpFill');
+            const opponentHpText = document.getElementById('opponentHpText');
+            const questionTextEl = document.getElementById('questionText');
+            const answerBtns = document.querySelectorAll('.answer-btn');
+            const explanationEl = document.getElementById('explanationMessage');
+            const battleMessageEl = document.getElementById('battleMessage');
+            const nextBattleBtn = document.getElementById('nextBattleBtn');
+            const badgeListEl = document.getElementById('badgeList');
+
+            // 初始化遊戲
+            function initGame() {
+                resetBattleHp();
+                pickRandomQuestion();          // 抽取第一題
+                updateOpponentUI();
+                updateHpBars();
+                renderBadges();
+                battleActive = true;
+                waitingForNext = false;
+                explanationEl.textContent = '';   // 清空解釋
+                battleMessageEl.textContent = '';
+                nextBattleBtn.textContent = '⚔️ 新挑戰 ⚔️';   // 一開始顯示新挑戰
+                nextBattleBtn.classList.remove('hidden');
+                enableAnswerButtons(true);
+            }
+
+            // 重置HP
+            function resetBattleHp() {
+                playerHp = 3;
+                opponentHp = 3;
+            }
+
+            // 從題庫隨機選題
+            function pickRandomQuestion() {
+                const randomIndex = Math.floor(Math.random() * QUESTION_BANK.length);
+                currentQuestion = { ...QUESTION_BANK[randomIndex] }; // 拷貝
+                displayQuestion();
+            }
+
+            // 顯示題目與選項
+            function displayQuestion() {
+                if (!currentQuestion) return;
+                questionTextEl.textContent = currentQuestion.question;
+                for (let i = 0; i < answerBtns.length; i++) {
+                    answerBtns[i].textContent = currentQuestion.options[i];
+                }
+            }
+
+            // 處理答案點擊
+            function handleAnswerClick(e) {
+                const btn = e.currentTarget;
+                if (!battleActive || waitingForNext) return;  // 戰鬥結束或等待下一題時不能點
+
+                const selectedIdx = parseInt(btn.dataset.index, 10);
+                selectedAnswerIndex = selectedIdx;
+                const isCorrect = (selectedIdx === currentQuestion.correct);
+
+                // 播放音效
+                if (isCorrect) {
+                    Sound.correct();
+                } else {
+                    Sound.wrong();
+                }
+
+                // 扣血
+                if (isCorrect) {
+                    opponentHp -= 1;
+                } else {
+                    playerHp -= 1;
+                }
+                updateHpBars();
+
+                // 顯示解釋 (無論對錯)
+                explanationEl.textContent = currentQuestion.explanation;
+
+                // 停用答案按鈕
+                enableAnswerButtons(false);
+
+                // 檢查戰鬥是否結束
+                if (opponentHp <= 0) {
+                    // 勝利
+                    battleActive = false;
+                    waitingForNext = false;
+                    battleMessageEl.textContent = '🎉 勝利！獲得新知識徽章！';
+                    // 新增徽章 (捕捉)
+                    captureBadge();
+                    // 當前徽章勝場+1 並檢查進化
+                    const currentBadge = badges[currentBadgeIndex];
+                    currentBadge.wins += 1;
+                    if (currentBadge.wins >= 2 && currentBadge.stage === 'base') {
+                        evolveBadge(currentBadge);
+                    }
+                    renderBadges();
+
+                    nextBattleBtn.textContent = '🌟 新挑戰 🌟';
+                    nextBattleBtn.classList.remove('hidden');
+                    Sound.victory();
+                } else if (playerHp <= 0) {
+                    // 失敗
+                    battleActive = false;
+                    waitingForNext = false;
+                    battleMessageEl.textContent = '😵 這次失敗了，再試試看吧！';
+                    nextBattleBtn.textContent = '🔄 重新挑戰';
+                    nextBattleBtn.classList.remove('hidden');
+                    Sound.defeat();
+                } else {
+                    // 戰鬥未結束，進入等待下一題模式
+                    waitingForNext = true;
+                    battleMessageEl.textContent = isCorrect ? '✅ 答對了！' : '❌ 答錯了...';
+                    nextBattleBtn.textContent = '➡️ 下一題';
+                    nextBattleBtn.classList.remove('hidden');
+                }
+            }
+
+            // 捕捉徽章 (原本的捕捉對手)
+            function captureBadge() {
+                // 新增一個基礎徽章 (新手家長)
+                const newBadge = {
+                    baseName: '基礎心理',
+                    name: '新手家長',
+                    emoji: '📘',
+                    wins: 0,
+                    stage: 'base'
+                };
+                badges.push(newBadge);
+            }
+
+            // 進化徽章 (名稱、表情變化)
+            function evolveBadge(badge) {
+                // 簡單進化：變成「資深家長」或「育兒達人」
+                if (badge.baseName === '基礎心理') {
+                    badge.name = '育兒達人';
+                    badge.emoji = '🏅';
+                    badge.stage = 'evolved';
+                }
+                Sound.evolve();
+            }
+
+            // 下一題或新挑戰按鈕點擊
+            function handleNextBattle() {
+                if (!battleActive) {
+                    // 戰鬥已結束：重設為新挑戰
+                    resetBattleHp();
+                    pickRandomQuestion();
+                    battleActive = true;
+                    waitingForNext = false;
+                    explanationEl.textContent = '';
+                    battleMessageEl.textContent = '';
+                    nextBattleBtn.classList.add('hidden');
+                    enableAnswerButtons(true);
+                    updateOpponentUI();
+                    updateHpBars();
+                    renderBadges();  // 更新徽章顯示
+                } else if (waitingForNext) {
+                    // 戰鬥中下一題
+                    pickRandomQuestion();       // 新題目
+                    waitingForNext = false;
+                    explanationEl.textContent = '';   // 清空上題解釋
+                    battleMessageEl.textContent = '';
+                    nextBattleBtn.classList.add('hidden');
+                    enableAnswerButtons(true);
+                }
+            }
+
+            // 啟用/禁用答案按鈕
+            function enableAnswerButtons(enabled) {
+                answerBtns.forEach(btn => {
+                    if (enabled) {
+                        btn.classList.remove('disabled');
+                    } else {
+                        btn.classList.add('disabled');
+                    }
+                });
+            }
+
+            // 更新對手UI (名稱、表情)
+            function updateOpponentUI() {
+                opponentNameEl.textContent = currentOpponent.name;
+                opponentEmojiEl.textContent = currentOpponent.emoji;
+            }
+
+            // 更新HP條
+            function updateHpBars() {
+                const oppPercent = (opponentHp / 3) * 100;
+                opponentHpFill.style.width = oppPercent + '%';
+                opponentHpText.textContent = opponentHp + '/3';
+                // 玩家HP不另外顯示，但可透過徽章卡片上的勝場了解
+            }
+
+            // 渲染徽章列表
+            function renderBadges() {
+                let html = '';
+                badges.forEach((badge, idx) => {
+                    const activeClass = (idx === currentBadgeIndex) ? 'active' : '';
+                    html += `
+                        <div class="badge-card ${activeClass}" data-index="${idx}">
+                            <span class="badge-emoji">${badge.emoji}</span>
+                            <span>${badge.name}</span>
+                            <span class="wins">🏆${badge.wins}</span>
+                        </div>
+                    `;
+                });
+                badgeListEl.innerHTML = html;
+
+                // 點擊切換徽章
+                document.querySelectorAll('.badge-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const index = card.dataset.index;
+                        if (index === undefined) return;
+                        switchBadge(parseInt(index));
+                    });
+                });
+            }
+
+            // 切換當前使用的徽章
+            function switchBadge(newIndex) {
+                if (newIndex === currentBadgeIndex) return;
+                Sound.switch();
+                currentBadgeIndex = newIndex;
+                // 重置戰鬥 (換徽章重新開始)
+                resetBattleHp();
+                pickRandomQuestion();
+                battleActive = true;
+                waitingForNext = false;
+                explanationEl.textContent = '';
+                battleMessageEl.textContent = '';
+                nextBattleBtn.classList.add('hidden');
+                enableAnswerButtons(true);
+                updateOpponentUI();
+                updateHpBars();
+                renderBadges();  // 重新渲染高亮
+            }
+
+            // 綁定事件
+            answerBtns.forEach(btn => {
+                btn.addEventListener('click', handleAnswerClick);
+            });
+            nextBattleBtn.addEventListener('click', handleNextBattle);
+
+            // 啟動遊戲
+            initGame();
+        })();
+    </script>
+</body>
+</html>
